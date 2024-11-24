@@ -57,16 +57,8 @@ This project involves food image classification using various datasets. The goal
 ### Directory Structure
 
 After downloading and placing the datasets, your project directory should look like this:
-Capstone Project/
-│
-├── dataset/
-│ └── food_images/
-│ ├── indonesian-food/
-│ ├── UECFOOD256/
-│ └── Food-101/
-│
-└── scripts/
-└── evaluate_model.py
+![image](https://github.com/user-attachments/assets/9cc4b952-dec9-4d14-9918-3ef4df92a866)
+
 
 
 ### Conclusion
