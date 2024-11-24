@@ -59,7 +59,20 @@ This project involves food image classification using various datasets. The goal
 After downloading and placing the datasets, your project directory should look like this:
 ![image](https://github.com/user-attachments/assets/9cc4b952-dec9-4d14-9918-3ef4df92a866)
 
+## Installation
 
+To set up the project, you need to install the required packages. You can do this using pip. Make sure you have Python and pip installed on your system.
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/your-repo-name.git
+   cd your-repo-name
+   ```
+
+2. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ### Conclusion
 
