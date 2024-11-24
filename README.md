@@ -65,8 +65,8 @@ To set up the project, you need to install the required packages. You can do thi
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/dana-ml27-bangkit2024/Capstone-C242-PS384_Project01
+   cd Capstone-C242-PS384_Project01
    ```
 
 2. Install the required packages:
