@@ -1,2 +1,3 @@
 models/hypertension_model.joblib
 models/stroke_model.joblib
+models/disease-prediction-model.joblib
