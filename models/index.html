@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Risk Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+</head>
+<body>
+    <h1>Health Risk Prediction</h1>
+    <form id="inputForm">
+        <label for="height">Height (cm):</label>
+        <input type="number" id="height" required><br>
+        <label for="weight">Weight (kg):</label>
+        <input type="number" id="weight" required><br>
+        <label for="gender">Gender (1 for Male, 0 for Female):</label>
+        <input type="number" id="gender" required><br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" required><br>
+        <label for="blood_pressure">Blood Pressure (mmHg):</label>
+        <input type="number" id="blood_pressure"><br>
+        <label for="cholesterol">Cholesterol (mg/dL):</label>
+        <input type="number" id="cholesterol"><br>
+        <label for="blood_glucose">Blood Glucose (mg/dL):</label>
+        <input type="number" id="blood_glucose"><br>
+        <button type="submit">Predict</button>
+    </form>
+    <h2>Prediction Results:</h2>
+    <pre id="results"></pre>
+
+    <script>
+        let model;
+
+        document.getElementById('inputForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const gender = parseFloat(document.getElementById('gender').value);
+            const age = parseFloat(document.getElementById('age').value);
+            const blood_pressure = parseFloat(document.getElementById('blood_pressure').value);
+            const cholesterol = parseFloat(document.getElementById('cholesterol').value);
+            const blood_glucose = parseFloat(document.getElementById('blood_glucose').value);
+
+            // Buat array dengan 15 elemen (padding dengan zeros)
+            const inputArray = [
+                height, weight, gender, age, blood_pressure, cholesterol, blood_glucose,
+                0, 0, 0, 0, 0, 0, 0, 0 // padding zeros untuk mencapai 15 elemen
+            ];
+
+            try {
+                const inputTensor = tf.tensor2d([inputArray]);
+                const predictions = model.predict(inputTensor).dataSync();
+
+                // Convert predictions to percentages
+                const formatPrediction = (value) => {
+                    // Convert to percentage and round to 2 decimal places
+                    const percentage = (value * 100).toFixed(2);
+                    return `${percentage}%`;
+                };
+
+                const results = {
+                    anemia: formatPrediction(predictions[0]),
+                    cholesterol: formatPrediction(predictions[1]),
+                    ckd: formatPrediction(predictions[2]),
+                    diabetes: formatPrediction(predictions[3]),
+                    heart: formatPrediction(predictions[4]),
+                    hypertension: formatPrediction(predictions[5]),
+                    ms: formatPrediction(predictions[6]),
+                    nafld: formatPrediction(predictions[7]),
+                    obesity: formatPrediction(predictions[8]),
+                    stroke: formatPrediction(predictions[9])
+                };
+
+                // Format output with labels
+                const formattedResults = Object.entries(results)
+                    .map(([condition, risk]) => `${condition.toUpperCase()}: ${risk}`)
+                    .join('\n');
+
+                document.getElementById('results').textContent = formattedResults;
+            } catch (error) {
+                console.error("Prediction error:", error);
+                document.getElementById('results').textContent = "Error making prediction. Please check console for details.";
+            }
+        });
+
+        async function loadModel() {
+            try {
+                model = await tf.loadLayersModel('tfjs_model/model.json');
+                console.log("Model loaded successfully");
+                // Tambahkan indikator visual bahwa model sudah siap
+                document.getElementById('results').textContent = "Model ready for predictions";
+            } catch (error) {
+                console.error("Error loading model:", error);
+                document.getElementById('results').textContent = "Error loading model. Please check console for details.";
+            }
+        }
+
+        loadModel();
+    </script>
+</body>
+</html>
