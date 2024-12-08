@@ -89,7 +89,6 @@
             try {
                 model = await tf.loadLayersModel('tfjs_model/model.json');
                 console.log("Model loaded successfully");
-                // Tambahkan indikator visual bahwa model sudah siap
                 document.getElementById('results').textContent = "Model ready for predictions";
             } catch (error) {
                 console.error("Error loading model:", error);

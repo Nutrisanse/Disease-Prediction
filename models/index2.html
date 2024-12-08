@@ -63,7 +63,6 @@
     <div id="results"></div>
 
     <script>
-        // Definisikan L2 regularizer
         class L2 {
             static className = 'L2';
             constructor(config) {
@@ -74,7 +73,6 @@
             }
         }
         
-        // Register L2 regularizer
         tf.serialization.registerClass(L2);
         
     
@@ -253,14 +251,11 @@
 
         let selectedSymptoms = [];
         
-        // Populate dropdown with symptoms
         window.onload = function() {
             const select = document.getElementById('symptomSelect');
             if (select) {
-                // Clear existing options
                 select.innerHTML = '<option value="">-- Pilih gejala --</option>';
                 
-                // Add sorted symptoms
                 Object.keys(symptomsMapping).sort().forEach(symptom => {
                     const option = document.createElement('option');
                     option.value = symptom;
@@ -304,10 +299,8 @@
                 console.log("inputted symptoms:", selectedSymptoms);
                 console.log("\nanalyze symptoms...\n");
                 
-                // Konversi gejala ke bahasa Inggris
                 const symptoms = selectedSymptoms.map(symptom => symptomsMapping[symptom]);
                 
-                // Buat array input untuk model
                 const inputArray = new Array(132).fill(0);
                 const validSymptoms = [];
                 const invalidSymptoms = [];
@@ -322,7 +315,6 @@
                     }
                 });
 
-                // Load dan jalankan model
                 const model = await tf.loadLayersModel('tfjs_symptoms_model/model.json', {
                     strict: false
                 });
@@ -330,7 +322,6 @@
                 const inputTensor = tf.tensor2d([inputArray]);
                 const prediction = await model.predict(inputTensor).array();
                 
-                // Format hasil prediksi
                 const diseases = [];
                 prediction[0].forEach((prob, idx) => {
                     if (prob >= 0.1) { // threshold 10%
@@ -344,10 +335,8 @@
                     }
                 });
                 
-                // Sort berdasarkan probabilitas tertinggi
                 diseases.sort((a, b) => b.probability - a.probability);
                 
-                // Tampilkan hasil
                 let output = `inputted symptoms: ${JSON.stringify(selectedSymptoms)}\n\n`;
                 output += `valid symptoms: ${validSymptoms.join(', ')}\n`;
                 if (invalidSymptoms.length > 0) {
