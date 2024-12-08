@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Symptoms Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .symptoms-container {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .symptom-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            padding: 5px;
+            background-color: #f5f5f5;
+            border-radius: 3px;
+        }
+        .remove-btn {
+            margin-left: 10px;
+            color: red;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        select, button {
+            padding: 8px;
+            margin: 5px;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Health Symptoms Prediction</h1>
+    
+    <div>
+        <h3>Pilih Gejala:</h3>
+        <select id="symptomSelect">
+            <option value="">-- Pilih gejala --</option>
+        </select>
+        <button onclick="addSymptom()">Tambah Gejala</button>
+    </div>
+
+    <div id="selectedSymptoms" class="symptoms-container"></div>
+    
+    <button onclick="predict()">Prediksi</button>
+    <button onclick="testModelInput()">Test Model Input</button>
+    
+    <div id="results"></div>
+
+    <script>
+        // Definisikan L2 regularizer
+        class L2 {
+            static className = 'L2';
+            constructor(config) {
+                this.l2 = config.l2;
+            }
+            apply(weights) {
+                return tf.mul(tf.sum(tf.square(weights)), this.l2);
+            }
+        }
+        
+        // Register L2 regularizer
+        tf.serialization.registerClass(L2);
+        
+    
+        const symptomsMapping = {
+            'gatal': 'itching',
+            'ruam kulit': 'skin_rash', 
+            'benjolan pada kulit': 'nodal_skin_eruptions',
+            'jerawat bernanah': 'pus_filled_pimples',
+            'komedo': 'blackheads',
+            'kulit mengelupas': 'skin_peeling',
+            'kulit seperti berdebu perak': 'silver_like_dusting',
+            'luka merah di sekitar hidung': 'red_sore_around_nose',
+            'keropeng kuning': 'yellow_crust_ooze',
+            'bersin terus menerus': 'continuous_sneezing',
+            'menggigil': 'shivering',
+            'meriang': 'chills',
+            'nyeri sendi': 'joint_pain',
+            'sakit perut': 'stomach_pain',
+            'asam lambung': 'acidity',
+            'sariawan': 'ulcers_on_tongue',
+            'otot mengecil': 'muscle_wasting',
+            'muntah': 'vomiting',
+            'rasa terbakar saat buang air kecil': 'burning_micturition',
+            'bercak saat buang air kecil': 'spotting_urination',
+            'kelelahan': 'fatigue',
+            'kenaikan berat badan': 'weight_gain',
+            'penurunan berat badan': 'weight_loss',
+            'kecemasan': 'anxiety',
+            'tangan dan kaki dingin': 'cold_hands_and_feets',
+            'perubahan suasana hati': 'mood_swings',
+            'gelisah': 'restlessness',
+            'lesu': 'lethargy',
+            'bercak di tenggorokan': 'patches_in_throat',
+            'batuk': 'cough',
+            'sesak napas': 'breathlessness',
+            'berkeringat': 'sweating',
+            'dehidrasi': 'dehydration',
+            'gangguan pencernaan': 'indigestion',
+            'sakit kepala': 'headache',
+            'kulit kuning': 'yellowish_skin',
+            'urin gelap': 'dark_urine',
+            'mual': 'nausea',
+            'kehilangan nafsu makan': 'loss_of_appetite',
+            'nyeri di belakang mata': 'pain_behind_the_eyes',
+            'nyeri punggung': 'back_pain',
+            'sembelit': 'constipation',
+            'nyeri perut': 'abdominal_pain',
+            'diare': 'diarrhoea',
+            'demam ringan': 'mild_fever',
+            'demam tinggi': 'high_fever',
+            'mata cekung': 'sunken_eyes',
+            'urin kuning': 'yellow_urine',
+            'mata kuning': 'yellowing_of_eyes',
+            'gagal hati akut': 'acute_liver_failure',
+            'kelebihan cairan': 'fluid_overload',
+            'perut membengkak': 'swelling_of_stomach',
+            'pembengkakan kelenjar getah bening': 'swelled_lymph_nodes',
+            'malaise': 'malaise',
+            'penglihatan kabur': 'blurred_and_distorted_vision',
+            'dahak': 'phlegm',
+            'iritasi tenggorokan': 'throat_irritation',
+            'mata merah': 'redness_of_eyes',
+            'tekanan sinus': 'sinus_pressure',
+            'hidung berair': 'runny_nose',
+            'hidung tersumbat': 'congestion',
+            'nyeri dada': 'chest_pain',
+            'kelemahan anggota tubuh': 'weakness_in_limbs',
+            'detak jantung cepat': 'fast_heart_rate',
+            'nyeri saat buang air besar': 'pain_during_bowel_movements',
+            'nyeri di daerah anus': 'pain_in_anal_region',
+            'tinja berdarah': 'bloody_stool',
+            'iritasi pada anus': 'irritation_in_anus',
+            'nyeri leher': 'neck_pain',
+            'pusing': 'dizziness',
+            'kram': 'cramps',
+            'memar': 'bruising',
+            'obesitas': 'obesity',
+            'kaki bengkak': 'swollen_legs',
+            'pembuluh darah bengkak': 'swollen_blood_vessels',
+            'wajah dan mata bengkak': 'puffy_face_and_eyes',
+            'kelenjar tiroid membesar': 'enlarged_thyroid',
+            'kuku rapuh': 'brittle_nails',
+            'ekstremitas bengkak': 'swollen_extremeties',
+            'rasa lapar berlebihan': 'excessive_hunger',
+            'bibir kering dan kesemutan': 'drying_and_tingling_lips',
+            'bicara pelo': 'slurred_speech',
+            'nyeri lutut': 'knee_pain',
+            'nyeri sendi pinggul': 'hip_joint_pain',
+            'kelemahan otot': 'muscle_weakness',
+            'leher kaku': 'stiff_neck',
+            'sendi bengkak': 'swelling_joints',
+            'kekakuan gerakan': 'movement_stiffness',
+            'gerakan berputar': 'spinning_movements',
+            'kehilangan keseimbangan': 'loss_of_balance',
+            'goyah': 'unsteadiness',
+            'kelemahan satu sisi tubuh': 'weakness_of_one_body_side',
+            'kehilangan penciuman': 'loss_of_smell',
+            'ketidaknyamanan kandung kemih': 'bladder_discomfort',
+            'bau urin tidak sedap': 'foul_smell_of urine',
+            'buang air kecil terus menerus': 'continuous_feel_of_urine',
+            'buang gas': 'passage_of_gases',
+            'gatal internal': 'internal_itching',
+            'wajah toksik': 'toxic_look_(typhos)',
+            'depresi': 'depression',
+            'mudah tersinggung': 'irritability',
+            'nyeri otot': 'muscle_pain',
+            'perubahan kesadaran': 'altered_sensorium',
+            'bintik merah di tubuh': 'red_spots_over_body',
+            'nyeri perut': 'belly_pain',
+            'menstruasi tidak normal': 'abnormal_menstruation',
+            'bercak perubahan warna': 'dischromic_patches',
+            'mata berair': 'watering_from_eyes',
+            'nafsu makan meningkat': 'increased_appetite',
+            'buang air kecil berlebihan': 'polyuria',
+            'riwayat keluarga': 'family_history',
+            'dahak berlendir': 'mucoid_sputum',
+            'dahak berkarat': 'rusty_sputum',
+            'kurang konsentrasi': 'lack_of_concentration',
+            'gangguan penglihatan': 'visual_disturbances',
+            'menerima transfusi darah': 'receiving_blood_transfusion',
+            'menerima suntikan tidak steril': 'receiving_unsterile_injections',
+            'koma': 'coma',
+            'pendarahan lambung': 'stomach_bleeding',
+            'perut membuncit': 'distention_of_abdomen',
+            'riwayat konsumsi alkohol': 'history_of_alcohol_consumption',
+            'dahak berdarah': 'blood_in_sputum',
+            'pembuluh darah menonjol di betis': 'prominent_veins_on_calf',
+            'jantung berdebar': 'palpitations',
+            'nyeri saat berjalan': 'painful_walking',
+            'lepuh': 'blister'
+        };
+
+        const diseaseMapping = {
+            'Fungal infection': 0,
+            'Allergy': 1,
+            'GERD': 2,
+            'Chronic cholestasis': 3,
+            'Drug Reaction': 4,
+            'Peptic ulcer disease': 5,
+            'AIDS': 6,
+            'Diabetes': 7,
+            'Gastroenteritis': 8,
+            'Bronchial Asthma': 9,
+            'Hypertension': 10,
+            'Migraine': 11,
+            'Cervical spondylosis': 12,
+            'Paralysis (brain hemorrhage)': 13,
+            'Jaundice': 14,
+            'Malaria': 15,
+            'Chicken pox': 16,
+            'Dengue': 17,
+            'Typhoid': 18,
+            'hepatitis A': 19,
+            'Hepatitis B': 20,
+            'Hepatitis C': 21,
+            'Hepatitis D': 22,
+            'Hepatitis E': 23,
+            'Alcoholic hepatitis': 24,
+            'Tuberculosis': 25,
+            'Common Cold': 26,
+            'Pneumonia': 27,
+            'Dimorphic hemorrhoids(piles)': 28,
+            'Heart attack': 29,
+            'Varicose veins': 30,
+            'Hypothyroidism': 31,
+            'Hyperthyroidism': 32,
+            'Hypoglycemia': 33,
+            'Osteoarthritis': 34,
+            'Arthritis': 35,
+            '(vertigo) Paroxysmal Positional Vertigo': 36,
+            'Acne': 37,
+            'Urinary tract infection': 38,
+            'Psoriasis': 39,
+            'Impetigo': 40
+        };
+
+        let selectedSymptoms = [];
+        
+        // Populate dropdown with symptoms
+        window.onload = function() {
+            const select = document.getElementById('symptomSelect');
+            if (select) {
+                // Clear existing options
+                select.innerHTML = '<option value="">-- Pilih gejala --</option>';
+                
+                // Add sorted symptoms
+                Object.keys(symptomsMapping).sort().forEach(symptom => {
+                    const option = document.createElement('option');
+                    option.value = symptom;
+                    option.text = symptom;
+                    select.appendChild(option);
+                });
+            } else {
+                console.error('symptomSelect element not found');
+            }
+        };
+
+        function addSymptom() {
+            const symptom = symptomSelect.value;
+            if (symptom && !selectedSymptoms.includes(symptom)) {
+                selectedSymptoms.push(symptom);
+                updateSelectedSymptomsList();
+            }
+        }
+
+        function removeSymptom(symptom) {
+            selectedSymptoms = selectedSymptoms.filter(s => s !== symptom);
+            updateSelectedSymptomsList();
+        }
+
+        function updateSelectedSymptomsList() {
+            const container = document.getElementById('selectedSymptoms');
+            container.innerHTML = '';
+            selectedSymptoms.forEach(symptom => {
+                const div = document.createElement('div');
+                div.className = 'symptom-item';
+                div.innerHTML = `
+                    <span>${symptom}</span>
+                    <span class="remove-btn" onclick="removeSymptom('${symptom}')">&times;</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function predict() {
+            try {
+                console.log("inputted symptoms:", selectedSymptoms);
+                console.log("\nanalyze symptoms...\n");
+                
+                // Konversi gejala ke bahasa Inggris
+                const symptoms = selectedSymptoms.map(symptom => symptomsMapping[symptom]);
+                
+                // Buat array input untuk model
+                const inputArray = new Array(132).fill(0);
+                const validSymptoms = [];
+                const invalidSymptoms = [];
+                
+                symptoms.forEach((symptom, index) => {
+                    const idx = Object.values(symptomsMapping).indexOf(symptom);
+                    if (idx !== -1) {
+                        inputArray[idx] = 1;
+                        validSymptoms.push(selectedSymptoms[index]);
+                    } else {
+                        invalidSymptoms.push(symptom);
+                    }
+                });
+
+                // Load dan jalankan model
+                const model = await tf.loadLayersModel('tfjs_symptoms_model/model.json', {
+                    strict: false
+                });
+                
+                const inputTensor = tf.tensor2d([inputArray]);
+                const prediction = await model.predict(inputTensor).array();
+                
+                // Format hasil prediksi
+                const diseases = [];
+                prediction[0].forEach((prob, idx) => {
+                    if (prob >= 0.1) { // threshold 10%
+                        const diseaseName = Object.keys(diseaseMapping).find(key => diseaseMapping[key] === idx);
+                        if (diseaseName) {
+                            diseases.push({
+                                disease: diseaseName,
+                                probability: prob * 100
+                            });
+                        }
+                    }
+                });
+                
+                // Sort berdasarkan probabilitas tertinggi
+                diseases.sort((a, b) => b.probability - a.probability);
+                
+                // Tampilkan hasil
+                let output = `inputted symptoms: ${JSON.stringify(selectedSymptoms)}\n\n`;
+                output += `valid symptoms: ${validSymptoms.join(', ')}\n`;
+                if (invalidSymptoms.length > 0) {
+                    output += `invalid symptoms: ${invalidSymptoms.join(', ')}\n`;
+                }
+                
+                output += '\nPossible Diseases:\n';
+                diseases.forEach(d => {
+                    output += `- ${d.disease}: ${d.probability.toFixed(1)}%\n`;
+                });
+                
+                document.getElementById('results').innerHTML = `<pre>${output}</pre>`;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('results').innerHTML = `
+                    <h3>Error:</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        function testModelInput() {
+            const testCases = [
+                ['pusing', 'sakit kepala']
+            ];
+            
+            console.log("Running input tests...");
+            testCases.forEach((test, index) => {
+                console.log(`\nTest case ${index + 1}:`, test);
+                selectedSymptoms = test;
+                updateSelectedSymptomsList();
+                predict();
+            });
+        }
+    </script>
+</body>
+</html>
