@@ -43,19 +43,16 @@
             const cholesterol = parseFloat(document.getElementById('cholesterol').value);
             const blood_glucose = parseFloat(document.getElementById('blood_glucose').value);
 
-            // Buat array dengan 15 elemen (padding dengan zeros)
             const inputArray = [
                 height, weight, gender, age, blood_pressure, cholesterol, blood_glucose,
-                0, 0, 0, 0, 0, 0, 0, 0 // padding zeros untuk mencapai 15 elemen
+                0, 0, 0, 0, 0, 0, 0, 0 
             ];
 
             try {
                 const inputTensor = tf.tensor2d([inputArray]);
                 const predictions = model.predict(inputTensor).dataSync();
 
-                // Convert predictions to percentages
                 const formatPrediction = (value) => {
-                    // Convert to percentage and round to 2 decimal places
                     const percentage = (value * 100).toFixed(2);
                     return `${percentage}%`;
                 };
@@ -73,7 +70,6 @@
                     stroke: formatPrediction(predictions[9])
                 };
 
-                // Format output with labels
                 const formattedResults = Object.entries(results)
                     .map(([condition, risk]) => `${condition.toUpperCase()}: ${risk}`)
                     .join('\n');
