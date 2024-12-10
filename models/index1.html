@@ -30,55 +30,33 @@
     <pre id="results"></pre>
 
     <script>
-        class L2 {
-            static get className() {
-                return 'L2';
-            }
-
-            constructor(l2) {
-                this.l2 = l2;
-            }
-            
-            apply(weights) {
-                return tf.mul(tf.sum(tf.square(weights)), this.l2);
-            }
-        }
-        
-        tf.serialization.registerClass(L2);
-        
         let model;
 
-        // Function to calculate derived features
+        async function loadModel() {
+            try {
+                model = await tf.loadLayersModel('tfjs_disease_model/model.json');
+                console.log("Model loaded successfully");
+                document.getElementById('results').textContent = "Model ready for predictions";
+            } catch (error) {
+                console.error("Error loading model:", error);
+                document.getElementById('results').textContent = "Error loading model. Please check console for details.";
+            }
+        }
+
         function calculateDerivedFeatures(height, weight, gender, age, blood_pressure, cholesterol, blood_glucose) {
             const height_m = height / 100;
             const bmi = weight / (height_m ** 2);
-            
-            // Categories
-            const bmi_category = bmi < 18.5 ? 0 : (bmi < 25 ? 1 : (bmi < 30 ? 2 : 3));
-            const age_category = age < 30 ? 0 : (age < 45 ? 1 : (age < 60 ? 2 : 3));
-            const bp_category = blood_pressure < 120 ? 0 : (blood_pressure < 140 ? 1 : (blood_pressure < 160 ? 2 : 3));
-            
-            // Interactions
-            const bmi_age = bmi * age;
-            const bp_age = blood_pressure * age;
-            const bmi_bp = bmi * blood_pressure;
-            
-            // Nutrition calculations
             const sodium = weight * 20;
-            const fat = weight * (gender === 1 ? 0.15 : 0.25);
+            const fat = gender === 1 ? weight * 0.15 : weight * 0.25;
             const protein = weight * 0.9;
             const carbs = weight * 3;
-            
+            const cholesterolCalc = (bmi * 2) + (age * 0.15) + (blood_pressure * 0.05) + (blood_glucose * 0.02) + 150;
+
             return {
                 bmi: bmi,
-                bmi_category: bmi_category,
-                age_category: age_category,
-                bp_category: bp_category,
-                bmi_age: bmi_age,
-                bp_age: bp_age,
-                bmi_bp: bmi_bp,
                 sodium: sodium,
                 fat: fat,
+                cholesterol: cholesterolCalc,
                 protein: protein,
                 carbs: carbs
             };
@@ -95,31 +73,19 @@
             const cholesterol = parseFloat(document.getElementById('cholesterol').value);
             const blood_glucose = parseFloat(document.getElementById('blood_glucose').value);
 
-            // Calculate derived features
             const derived = calculateDerivedFeatures(height, weight, gender, age, blood_pressure, cholesterol, blood_glucose);
 
             const inputArray = [
                 height, weight, gender, age, blood_pressure, cholesterol, blood_glucose,
-                derived.bmi, derived.bmi_category, derived.age_category, derived.bp_category,
-                derived.bmi_age, derived.bp_age, derived.bmi_bp, derived.sodium,
-                derived.fat, derived.protein, derived.carbs,
-                ...Array(132 - 15).fill(0) // Adjust this if you need more features
+                derived.bmi, derived.sodium, derived.fat, derived.cholesterol,
+                derived.protein, derived.carbs,
+                0, 0 // Fill the remaining features with zeros or appropriate values
             ];
-
-            console.log("Height:", height);
-            console.log("Weight:", weight);
-            console.log("Gender:", gender);
-            console.log("Age:", age);
-            console.log("Blood Pressure:", blood_pressure);
-            console.log("Cholesterol:", cholesterol);
-            console.log("Blood Glucose:", blood_glucose);
-            console.log("Derived Features:", derived);
-            console.log("Input Array Length:", inputArray.length);
 
             try {
                 const inputTensor = tf.tensor2d([inputArray]);
                 const predictions = model.predict(inputTensor).dataSync();
-                
+
                 const normalizedPredictions = predictions.map(p => Math.min(Math.max(p, 0), 1));
 
                 const results = {
@@ -145,21 +111,6 @@
                 document.getElementById('results').textContent = "Error making prediction. Please check console for details.";
             }
         });
-
-        async function loadModel() {
-            try {
-                const modelConfig = {
-                    kernelRegularizer: new L2(0.01)
-                };
-                
-                model = await tf.loadLayersModel('tfjs_model/model.json', modelConfig);
-                console.log("Model loaded successfully");
-                document.getElementById('results').textContent = "Model ready for predictions";
-            } catch (error) {
-                console.error("Error loading model:", error);
-                document.getElementById('results').textContent = "Error loading model. Please check console for details.";
-            }
-        }
 
         const formatPrediction = (value) => {
             const percentage = (value * 100).toFixed(2);
