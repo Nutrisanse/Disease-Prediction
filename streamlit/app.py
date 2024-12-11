@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import json
 import os
-from PIL import Image
 
 # Set page config
 st.set_page_config(
