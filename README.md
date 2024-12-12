@@ -1,79 +1,68 @@
-# Food Image Classification Project
+# Disease Model Prediction Project
 
 ## Project Overview
 
-This project involves food image classification using various datasets. The goal is to implement a model that can recognize and classify different types of food images. This README provides instructions on how to manually download the required datasets and place them in the correct directory structure for the project.
+This repository contains a disease prediction model that allows users to input health data and receive predictions about potential diseases. The project includes two models that can be tested and deployed locally or accessed via a Streamlit deployment.
 
-## Required Datasets
+## Getting Started
 
-1. **Indonesian Food Dataset**
-2. **UEC FOOD 256 Dataset**
-3. **Food-101 Dataset**
+To get started with this project, follow the instructions below:
 
-### Dataset Download Instructions
+### Clone the Repository
 
-#### 1. Download the Indonesian Food Dataset
-
-- **Source**: [Roboflow Indonesian Food Dataset](https://universe.roboflow.com/bangkit/indonesian-food-pedsx/dataset/1)
-- **Instructions**:
-  1. Visit the link above.
-  2. Click on the "Download" button to download the dataset.
-  3. Extract the downloaded ZIP file.
-
-- **Placement**:
-  - Move the extracted folder to the following directory in your project:
-    ```
-    dataset/food_images/indonesian-food/
-    ```
-
-#### 2. Download the UEC FOOD 256 Dataset
-
-- **Source**: [Kaggle UEC FOOD 256 Dataset](https://www.kaggle.com/datasets/rkuo2000/uecfood256)
-- **Instructions**:
-  1. Visit the Kaggle link above.
-  2. Click on the "Download" button to download the dataset.
-  3. Extract the downloaded ZIP file.
-
-- **Placement**:
-  - Move the extracted folder to the following directory in your project:
-    ```
-    dataset/food_images/UECFOOD256/
-    ```
-
-#### 3. Download the Food-101 Dataset
-
-- **Source**: [Kaggle Food-101 Dataset](https://www.kaggle.com/datasets/kmader/food41)
-- **Instructions**:
-  1. Visit the Kaggle link above.
-  2. Click on the "Download" button to download the dataset.
-  3. Extract the downloaded ZIP file.
-
-- **Placement**:
-  - Move the extracted folder to the following directory in your project:
-    ```
-    dataset/food_images/Food-101/
-    ```
-
-### Directory Structure
-
-After downloading and placing the datasets, your project directory should look like this:
-![image](https://github.com/user-attachments/assets/9cc4b952-dec9-4d14-9918-3ef4df92a866)
-
-## Installation
-
-To set up the project, you need to install the required packages. You can do this using pip. Make sure you have Python and pip installed on your system.
-
-1. Clone the repository:
+1. Clone the repository to your local machine:
    ```bash
    git clone https://github.com/dana-ml27-bangkit2024/Capstone-C242-PS384_Project01
    cd Capstone-C242-PS384_Project01
    ```
 
+### Testing Model Deployment
+
+#### Model 1
+
+To test the deployment of Model 1, follow these steps:
+
+1. Navigate to the `models` directory.
+2. Start a local HTTP server:
+   ```bash
+   python -m http.server
+   ```
+3. Open Google Chrome and enter the following URL:
+   ```
+   http://localhost:8000/models/index1.html
+   ```
+
+#### Model 2
+
+To test the deployment of Model 2, follow these steps:
+
+1. Navigate to the `models` directory.
+2. Start a local HTTP server:
+   ```bash
+   python -m http.server
+   ```
+3. Open Google Chrome and enter the following URL:
+   ```
+   http://localhost:8000/models/index2.html
+   ```
+
+### Running the Streamlit Application
+
+To run the Streamlit application locally:
+
+1. Ensure you are in the root folder of the project.
 2. Install the required packages:
    ```bash
    pip install -r requirements.txt
    ```
+3. Run the Streamlit application:
+   ```bash
+   streamlit run app.py
+   ```
 
-### Conclusion
+Alternatively, you can access the deployed Streamlit application using the following link:
+[Streamlit Deployment](https://capstone-c242-ps384-deploy-model.streamlit.app/)
 
-By following the instructions above, you will have all the necessary datasets in the correct directory structure for your project. If you have any questions or need further assistance, feel free to reach out!
+## Conclusion
+
+By following the instructions above, you will be able to test and deploy the disease prediction models. If you have any questions or need further assistance, feel free to reach out!
