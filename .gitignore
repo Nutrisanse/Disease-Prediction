@@ -6,3 +6,4 @@ tfjs-env/Lib/site-packages/tensorflow/python/_pywrap_tensorflow_internal.pyd
 tfjs-env/Lib/site-packages/~ensorflow/python/_pywrap_tensorflow_internal.pyd
 tfjs-env/Lib/site-packages/~ensorflow/python/_pywrap_tensorflow_internal.pyd
 .venv/Lib/site-packages/tensorflow/python/_pywrap_tensorflow_internal.pyd
+.venv
