@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-This repository contains a disease prediction model that allows users to input health data and receive predictions about potential diseases. The project includes two models that can be tested and deployed locally or accessed via a Streamlit deployment.
+This repository contains a disease prediction model that allows users to input body health metrics data and receive predictions about potential diseases. The project includes two models that can be tested and deployed locally or accessed via a Streamlit deployment.
 
 ## Getting Started
 
-To get started with this project, follow the instructions below:
+To start the deployment on this project, follow the instructions below:
 
 ### Clone the Repository
 
@@ -60,80 +60,53 @@ To run the Streamlit application locally:
    streamlit run app.py
    ```
 
-Alternatively, you can access the deployed Streamlit application using the following link:
-[Streamlit Deployment](https://capstone-c242-ps384-deploy-model.streamlit.app/)
+Or..... you can just access the deployed Streamlit application from this link:
+[Streamlit Model Deployment](https://capstone-c242-ps384-deploy-model.streamlit.app/)
 
 ## Testing the Model Code
 
 ### Model 1: Health Data Prediction
 
+Before the setup, make sure you are inside "Capstone-2C24-PS384_Project01" as the root folder in the code editor.
+
 1. **Set Up the Environment**
-   - Pastikan Anda menggunakan environment conda dengan Python 3.10.15.
-   - Install requirements yang diperlukan dengan menjalankan:
+   - Make sure you are using a conda environment with Python 3.10.15.
+   - Install the required packages by running:
      ```bash
      pip install -r scripts/requirement-model1.txt
      ```
+   - Run the import cell section to test the installed library, make sure there is no error
 
-2. **Run the Jupyter Notebook**
-   - Buka terminal dan navigasikan ke direktori `scripts`:
-     ```bash
-     cd scripts
-     ```
-   - Jalankan Jupyter Notebook:
-     ```bash
-     jupyter notebook health_data1_tf.ipynb
-     ```
-   - Setelah Jupyter Notebook terbuka di browser, jalankan setiap sel secara berurutan untuk memproses data dan melatih model.
+2. **Check Data Availability**
+   - Make sure all required dataset files are present in the `dataset/health_data1` folder.
+   - If there any files are missing, you will see a error message indicating which files are not found when running the next step.
 
-3. **Check Data Availability**
-   - Pastikan semua file dataset yang diperlukan ada di folder `dataset/health_data1`.
-   - Jika ada file yang hilang, Anda akan melihat pesan yang menunjukkan file yang tidak ditemukan.
+3. **Preprocess the dataset**
+   - Run the cell with the preprocessing code to combined the dataset.
+   - Once data preprocessing is done, the new dataset will be saved in the 'dataset/health_data1' folder as 'combined_dataset.csv'
 
 4. **Train the Model**
-   - Setelah semua data dimuat, model akan dilatih. Perhatikan output untuk melihat akurasi dan metrik lainnya.
+   - After all data is loaded, the model will be trained. Pay attention to the output to see accuracy and other metrics.
 
 5. **Save the Model**
-   - Setelah pelatihan selesai, model akan disimpan di folder `models` sebagai file HDF5.
+   - Once training is complete, the model will be saved in the `models` folder as an HDF5 file.
 
 ### Model 2: Symptoms Prediction
 
 1. **Set Up the Environment**
-   - Pastikan Anda menggunakan environment conda dengan Python 3.10.15.
-   - Jika Anda sudah menginstal requirements untuk Model 1, Anda tidak perlu menginstalnya lagi untuk Model 2.
+   - Ensure you are using a conda environment with Python 3.10.15.
+   - If you have already installed the requirements for Model 1, you do not need to install them again for Model 2.
 
-2. **Run the Jupyter Notebook**
-   - Buka terminal dan navigasikan ke direktori `scripts`:
-     ```bash
-     cd scripts
-     ```
-   - Jalankan Jupyter Notebook:
-     ```bash
-     jupyter notebook symptoms-predict.ipynb
-     ```
-   - Setelah Jupyter Notebook terbuka di browser, jalankan setiap sel secara berurutan untuk memproses data dan membuat prediksi berdasarkan gejala yang dimasukkan.
+2. **Input Symptoms**
+   - At the end of the notebook, you can input symptoms in Indonesian according to what is listed in `symptoms_mapping`.
 
-3. **Input Symptoms**
-   - Di bagian akhir notebook, Anda dapat memasukkan gejala dalam bahasa Indonesia sesuai dengan yang terdaftar di `symptoms_mapping`.
-
-4. **View Predictions**
-   - Setelah menjalankan sel yang sesuai, Anda akan melihat prediksi penyakit berdasarkan gejala yang dimasukkan.
+3. **View Predictions**
+   - After running the appropriate cell, you will see disease predictions based on the input symptoms.
 
 ### Convert HDF5 to TFJS
 
 1. **Set Up the Environment**
-   - Pastikan Anda menggunakan virtual environment `tfjs-env`.
+   - Make sure you are using the virtual environment `tfjs-env`.
 
-2. **Run the Jupyter Notebook**
-   - Buka terminal dan navigasikan ke direktori `scripts`:
-     ```bash
-     cd scripts
-     ```
-   - Jalankan Jupyter Notebook:
-     ```bash
-     jupyter notebook tfjs-converter.ipynb
-     ```
-   - Ikuti instruksi di dalam notebook untuk mengonversi model HDF5 ke format TFJS.
-
-## Conclusion
-
-By following the instructions above, you will be able to test and deploy the disease prediction models. If you have any questions or need further assistance, feel free to reach out!
+2. **Run**
+   - Run the specific cell to perform a model conversion
